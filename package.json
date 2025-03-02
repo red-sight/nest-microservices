@@ -2,8 +2,14 @@
   "name": "nest-microservices",
   "packageManager": "yarn@4.7.0",
   "private": true,
+  "scripts": {
+    "build": "turbo build"
+  },
   "workspaces": [
     "services/*",
     "lib/*"
-  ]
+  ],
+  "devDependencies": {
+    "turbo": "^2.4.4"
+  }
 }

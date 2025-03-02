@@ -1,0 +1,26 @@
+{
+  "name": "@lib/config-shared",
+  "version": "0.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "start:dev": "nodemon",
+    "build": "tsc -b",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "@lib/typescript-config": "workspace:^",
+    "@nestjs/microservices": "^10.4.15",
+    "@types/node": "^22.10.2",
+    "eslint": "^9.16.0",
+    "ioredis": "^5.4.2",
+    "nodemon": "^3.1.7",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0"
+  },
+  "dependencies": {
+    "@lib/config": "workspace:^"
+  }
+}

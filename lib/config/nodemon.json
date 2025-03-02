@@ -1,0 +1,6 @@
+{
+  "watch": ["src", "tsconfig.json"],
+  "ext": ".ts, .js, .mjs, .json",
+  "ignore": [],
+  "exec": "yarn build"
+}

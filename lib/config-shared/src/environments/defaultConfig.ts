@@ -1,18 +1,11 @@
-import { getEnvVar, getEnvVarOrThrow } from "@lib/config";
+import { getEnvVar } from "@lib/config";
 import { IConfig } from "../config.interface";
 import { Transport } from "@nestjs/microservices";
+import { VersioningType } from "@nestjs/common";
 
 const appCode = getEnvVar("APP_CODE") ?? "app-code";
 
 export const defaultConfig: IConfig = {
-  appCode,
-
-  serviceName: getEnvVarOrThrow("npm_package_name"),
-
-  appHost: getEnvVar("HOST") ?? "localhost",
-
-  httpPort: parseInt(getEnvVarOrThrow("HTTP_PORT")),
-
   redisOptions: {
     keyPrefix: appCode,
   },
@@ -27,4 +20,11 @@ export const defaultConfig: IConfig = {
       },
     },
   },
+
+  versioning: {
+    type: VersioningType.URI,
+    defaultVersion: "1",
+  },
+
+  validationPipeOptions: {},
 };

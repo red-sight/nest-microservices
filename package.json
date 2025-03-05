@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
-    "lint": "turbo lint"
+    "lint": "turbo lint",
+    "start:dev": "turbo start:dev"
   },
   "workspaces": [
     "services/*",

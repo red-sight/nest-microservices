@@ -12,10 +12,22 @@
   "devDependencies": {
     "@eslint/js": "^9.16.0",
     "@lib/typescript-config": "workspace:^",
+    "@types/amqplib": "^0",
     "@types/node": "^22.10.2",
     "eslint": "^9.16.0",
     "nodemon": "^3.1.7",
     "typescript": "5.7.3",
     "typescript-eslint": "^8.25.0"
+  },
+  "dependencies": {
+    "@lib/config-shared": "workspace:^",
+    "@nestjs/common": "^11.0.11",
+    "@nestjs/core": "^11.0.11",
+    "@nestjs/microservices": "^11.0.11",
+    "@nestjs/swagger": "^11.0.6",
+    "amqp-connection-manager": "^4.1.14",
+    "amqplib": "^0.10.5",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1"
   }
 }

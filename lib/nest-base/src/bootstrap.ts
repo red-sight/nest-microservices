@@ -40,14 +40,12 @@ export async function bootstrap(
   if (validationPipe) app.useGlobalPipes(new ValidationPipe(validationPipe));
 
   if (microservice) {
-    console.log("In microservice");
     service = app.connectMicroservice<AppMicroserviceOptions>(microservice);
     await app.startAllMicroservices();
     console.log(`✨ Microservice ${serviceName} has started`);
   }
 
   if (httpService) {
-    console.log("In httpservice");
     const httpPort = getEnvVarOrThrow("HTTP_PORT");
     configureSwagger(app);
     await app.listen(httpPort, () => {

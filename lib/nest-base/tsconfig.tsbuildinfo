@@ -1,1 +1,1 @@
-{"root":["./src/bootstrap.ts","./src/index.ts"],"version":"5.7.3"}
+{"root":["./src/index.ts","./src/bootstrap/bootstrap.ts","./src/bootstrap/index.ts","./src/modules/index.ts","./src/modules/microservice-client/index.ts","./src/modules/microservice-client/microservice-client.module.ts","./src/modules/redis/index.ts","./src/modules/redis/redis-utils.ts","./src/modules/redis/redis.module.ts","./src/modules/redis/redis.service.ts","./src/types/index.ts","./src/types/injection-tokens.enum.ts","./src/types/register-pattern.interface.ts"],"version":"5.7.3"}

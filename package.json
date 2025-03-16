@@ -5,7 +5,8 @@
   "scripts": {
     "build": "turbo build",
     "lint": "turbo lint",
-    "start:dev": "turbo start:dev"
+    "start:dev": "turbo watch start:dev build",
+    "watch": "turbo watch start:prod build"
   },
   "workspaces": [
     "services/*",

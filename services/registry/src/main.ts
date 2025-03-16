@@ -1,8 +1,8 @@
-import { bootstrap } from '@lib/nest-base';
+import { bootstrap } from '@lib/nest';
 import { AppModule } from './app.module';
 
 void bootstrap(AppModule, {
-  httpService: false,
-  versioning: false,
-  validationPipe: false,
+  enableHttpService: false,
+  enableVersioning: false,
+  enableValidationPipe: false,
 });

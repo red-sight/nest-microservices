@@ -1,13 +1,31 @@
 import { RedisOptions } from "ioredis";
-import { MicroserviceOptions, TcpOptions } from "@nestjs/microservices";
+import {
+  CustomStrategy,
+  GrpcOptions,
+  KafkaOptions,
+  MqttOptions,
+  NatsOptions,
+  RmqOptions,
+  TcpOptions,
+} from "@nestjs/microservices";
 import { ValidationPipeOptions, VersioningOptions } from "@nestjs/common";
 
-export type AppMicroserviceOptions = Exclude<MicroserviceOptions, TcpOptions>;
-
-export interface IConfig {
+export interface IConfig<
+  T =
+    | GrpcOptions
+    | TcpOptions
+    | RedisOptions
+    | NatsOptions
+    | MqttOptions
+    | RmqOptions
+    | KafkaOptions
+    | CustomStrategy,
+> {
   redisOptions: RedisOptions;
 
-  microserviceOptions: AppMicroserviceOptions;
+  microserviceOptions: T;
+
+  microserviceRegistryClientOptions: T;
 
   versioning: VersioningOptions;
 

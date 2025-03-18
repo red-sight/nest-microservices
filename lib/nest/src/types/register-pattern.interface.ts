@@ -8,3 +8,9 @@ export interface IServiceRecord {
   timestamp: number;
   doc: OpenAPIObject;
 }
+
+export interface IRegisterOptions {
+  host: string;
+  port: string;
+  name: string;
+}

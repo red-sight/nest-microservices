@@ -1,24 +1,25 @@
-import { EInjectionTokens, RedisService } from '@lib/nest';
+import { getEnvVarOrThrow } from '@lib/config';
+import { EInjectionTokens } from '@lib/nest';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class AppService {
   constructor(
-    private readonly redisService: RedisService,
     @Inject(EInjectionTokens.REGISTRY_SERVICE)
     private readonly client: ClientProxy,
   ) {}
 
-  async getHello(): Promise<unknown> {
-    const res = await this.redisService.keys('*');
-    console.log(res);
-
-    // return { success: 'hey' };
-
-    return await firstValueFrom(
-      this.client.send<unknown>('REGISTER', { message: 'hi' }),
-    );
+  getHello() {
+    const registerOptions = {
+      name: getEnvVarOrThrow('npm_package_name'),
+      port: getEnvVarOrThrow('HTTP_PORT'),
+      host: 'localhost',
+    };
+    this.client.send<unknown>('REGISTER', registerOptions).subscribe((data) => {
+      console.log('Response from registry:');
+      console.dir(data, { depth: null, colors: true });
+    });
+    return { message: 'Register request is being sent', registerOptions };
   }
 }

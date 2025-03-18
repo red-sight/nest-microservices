@@ -33,8 +33,11 @@ export async function bootstrap(
     );
 
   if (enableMicroservice) {
-    app.connectMicroservice(configShared.data.microserviceOptions);
+    app.connectMicroservice(configShared.data.microserviceOptions, {
+      inheritAppConfig: true,
+    });
     await app.startAllMicroservices();
+    // await app.init();
     console.log(`✨ Microservice ${serviceName} has started`);
   }
 
@@ -61,6 +64,7 @@ function configureSwagger(
     .setDescription("API description")
     .setVersion("1.0")
     .build();
+
   const documentFactory = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, documentFactory);
   return documentFactory;

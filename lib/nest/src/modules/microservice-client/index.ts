@@ -1,1 +1,1 @@
-export * from "./microservice-client.module";
+export * from "./registry-client.module";

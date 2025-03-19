@@ -1,10 +1,10 @@
+import { EMessagePatternRegistry } from "@lib/types";
 import { Inject, Module, OnApplicationBootstrap } from "@nestjs/common";
 import { ClientProxy, ClientsModule } from "@nestjs/microservices";
 import { EInjectionTokens } from "../../types";
 import { configShared } from "@lib/config-shared";
 import { getEnvVarOrThrow } from "@lib/config";
 import { firstValueFrom } from "rxjs";
-import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({})
 export class RegistryClientModule implements OnApplicationBootstrap {
@@ -21,10 +21,7 @@ export class RegistryClientModule implements OnApplicationBootstrap {
 
     return {
       module: RegistryClientModule,
-      imports: [
-        ClientsModule.register([registryClientOptions]),
-        ScheduleModule.forRoot(),
-      ],
+      imports: [ClientsModule.register([registryClientOptions])],
       providers: [],
       exports: [ClientsModule],
     };
@@ -40,7 +37,12 @@ export class RegistryClientModule implements OnApplicationBootstrap {
       host: "localhost",
     };
 
-    void firstValueFrom(this.client.send<unknown>("REGISTER", registerOptions));
+    void firstValueFrom(
+      this.client.send<unknown>(
+        EMessagePatternRegistry.registrationRequest,
+        registerOptions,
+      ),
+    );
     console.log("Registration request is being sent");
   }
 }

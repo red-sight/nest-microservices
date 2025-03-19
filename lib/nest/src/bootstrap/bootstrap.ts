@@ -37,7 +37,7 @@ export async function bootstrap(
       inheritAppConfig: true,
     });
     await app.startAllMicroservices();
-    // await app.init();
+    if (!enableHttpService) await app.init();
     console.log(`✨ Microservice ${serviceName} has started`);
   }
 

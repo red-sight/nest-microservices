@@ -16,6 +16,7 @@ export class AppService {
       port: getEnvVarOrThrow('HTTP_PORT'),
       host: 'localhost',
     };
+
     this.client.send<unknown>('REGISTER', registerOptions).subscribe((data) => {
       console.log('Response from registry:');
       console.dir(data, { depth: null, colors: true });

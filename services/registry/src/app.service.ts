@@ -1,3 +1,4 @@
+import { OpenAPIObject } from '@nestjs/swagger';
 import { RedisService, RegisterOptionsDto } from '@lib/nest';
 import { Injectable } from '@nestjs/common';
 
@@ -7,24 +8,81 @@ export class AppService {
 
   private readonly serviceRegistryKey = 'registry:service';
 
-  private generateServiceRegistryKey(name: string) {
+  private readonly generateServiceRegistryKey = (name: string) => {
     return `${this.serviceRegistryKey}:${name}`;
+  };
+
+  private readonly registrationRequestKey = 'registration-request';
+
+  private generateServiceRegistrationRequestKey({
+    name,
+    host,
+    port,
+  }: RegisterOptionsDto) {
+    return `${this.registrationRequestKey}:${name}:${host}:${port}`;
   }
 
   getHello(): string {
     return 'Hello World!';
   }
 
-  async register({ name, host, port }: RegisterOptionsDto) {
-    // const serviceOpenApiDocUrl = `http://${host}:${port}/api-json`;
-    // console.log(serviceOpenApiDocUrl);
-    // const res = await fetch(serviceOpenApiDocUrl, {
-    //   signal: AbortSignal.timeout(5000),
-    // });
-    // console.dir(await res.json(), { depth: null, colors: true });
+  async registrationRequest(opts: RegisterOptionsDto) {
     await this.redisService.redis.set(
-      this.generateServiceRegistryKey(name),
-      JSON.stringify({ name, host, port, alive: false, registered: false }),
+      this.generateServiceRegistrationRequestKey(opts),
+      'true',
     );
   }
+
+  async processRegistrationRequests() {
+    const registryRequests = (
+      await this.redisService.keys(`${this.registrationRequestKey}:*`)
+    )
+      .map(this.deserializeServiceRegistrationKey)
+      .filter(({ name, host, port }) => name && host && port);
+
+    const openApiDocs = (
+      await Promise.all(registryRequests.map(this.processRegistrationRequest))
+    ).filter((openApiDoc) => openApiDoc);
+
+    console.log('openApiDocs', openApiDocs);
+  }
+
+  private readonly deserializeServiceRegistrationKey = (
+    key: string,
+  ): TRegistrationRequest => {
+    const [, name, host, port] = key.split(':');
+    return { name, host, port: parseInt(port, 10) };
+  };
+
+  private readonly processRegistrationRequest = async ({
+    name,
+    host,
+    port,
+  }: TRegistrationRequest) => {
+    const serviceOpenApiDocUrl = `http://${host}:${port}/api-json`;
+    console.log(serviceOpenApiDocUrl);
+    try {
+      const res = await fetch(serviceOpenApiDocUrl, {
+        signal: AbortSignal.timeout(5000),
+      });
+      const openApiDoc = (await res.json()) as OpenAPIObject;
+      return openApiDoc;
+    } catch (e) {
+      console.warn(
+        `Failed to fetch service ${name} openapi doc by ${serviceOpenApiDocUrl}`,
+        e,
+      );
+      return null;
+    }
+  };
 }
+
+interface IServiceRecord {
+  name: string;
+  host: string;
+  port: number;
+  alive: boolean;
+  registered: boolean;
+}
+
+type TRegistrationRequest = Omit<IServiceRecord, 'alive' | 'registered'>;

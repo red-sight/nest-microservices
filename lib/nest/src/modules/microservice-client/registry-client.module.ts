@@ -7,7 +7,7 @@ import { getEnvVarOrThrow } from "@lib/config";
 import { firstValueFrom } from "rxjs";
 
 @Module({})
-export class RegistryClientModule implements OnApplicationBootstrap {
+export class RegistryClientModuleSav implements OnApplicationBootstrap {
   constructor(
     @Inject(EInjectionTokens.REGISTRY_SERVICE)
     private readonly client: ClientProxy,
@@ -20,7 +20,7 @@ export class RegistryClientModule implements OnApplicationBootstrap {
     };
 
     return {
-      module: RegistryClientModule,
+      module: RegistryClientModuleSav,
       imports: [ClientsModule.register([registryClientOptions])],
       providers: [],
       exports: [ClientsModule],

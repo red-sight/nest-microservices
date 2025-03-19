@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { configShared } from '@lib/config-shared';
-import { RegistryClientModule, RedisModule } from '@lib/nest';
+import { RedisModule, RegistryClientModule } from '@lib/nest';
 
 const options = configShared.data.redisOptions;
 

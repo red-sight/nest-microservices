@@ -1247,15 +1247,16 @@ __metadata:
     "@lib/config-shared": "workspace:^"
     "@lib/typescript-config": "workspace:^"
     "@nestjs-plugins/nestjs-nats-jetstream-transport": "npm:^2.2.6"
+    "@nestjs/bullmq": "npm:^11.0.2"
     "@nestjs/common": "npm:^11.0.11"
     "@nestjs/core": "npm:^11.0.11"
     "@nestjs/microservices": "npm:^11.0.11"
-    "@nestjs/schedule": "npm:^5.0.1"
     "@nestjs/swagger": "npm:^11.0.6"
     "@types/amqplib": "npm:^0"
     "@types/node": "npm:^22.10.2"
     amqp-connection-manager: "npm:^4.1.14"
     amqplib: "npm:^0.10.5"
+    bullmq: "npm:^5.44.0"
     class-transformer: "npm:^0.5.1"
     class-validator: "npm:^0.14.1"
     eslint: "npm:^9.16.0"
@@ -3421,6 +3422,21 @@ __metadata:
     tslib: "npm:^2.0.0"
     uuid: "npm:^9.0.0"
   checksum: 10c0/4d74d693fbe909562fc45ee859a03e3d5e60a91b3a0aab14abfe243168d2758be9d1543cfc8b228e8b12d402cb29937746e8a65a39a768fcb165712af334dce0
+  languageName: node
+  linkType: hard
+
+"bullmq@npm:^5.44.0":
+  version: 5.44.0
+  resolution: "bullmq@npm:5.44.0"
+  dependencies:
+    cron-parser: "npm:^4.9.0"
+    ioredis: "npm:^5.4.1"
+    msgpackr: "npm:^1.11.2"
+    node-abort-controller: "npm:^3.1.1"
+    semver: "npm:^7.5.4"
+    tslib: "npm:^2.0.0"
+    uuid: "npm:^9.0.0"
+  checksum: 10c0/db6655fa5cd2088d18c6415ac3f3250f8e42101bcdefbf4e036a460bc0f3b51879c31e785e9aefbff61b32c020eb40ab14468eb6739775bc152850b2c61d537d
   languageName: node
   linkType: hard
 

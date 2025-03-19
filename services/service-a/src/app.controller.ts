@@ -12,7 +12,7 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Post('/7')
+  @Post('/ups')
   aaa() {
     console.log('In aaa');
 

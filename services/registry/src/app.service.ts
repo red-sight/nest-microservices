@@ -8,11 +8,13 @@ export class AppService {
 
   private readonly serviceRegistryKey = 'registry:service';
 
+  private readonly registrationRequestKey = 'registration-request';
+
+  private readonly openApiDocKey = 'openapi-doc';
+
   private readonly generateServiceRegistryKey = (name: string) => {
     return `${this.serviceRegistryKey}:${name}`;
   };
-
-  private readonly registrationRequestKey = 'registration-request';
 
   private generateServiceRegistrationRequestKey({
     name,
@@ -21,6 +23,34 @@ export class AppService {
   }: RegisterOptionsDto) {
     return `${this.registrationRequestKey}:${name}:${host}:${port}`;
   }
+
+  private readonly generateOpenApiDocKey = (name: string) => {
+    return `${this.openApiDocKey}:${name}`;
+  };
+
+  private readonly openApiDoc = {
+    get: async (name: string) => {
+      const stored = await this.redisService.redis.get(
+        this.generateOpenApiDocKey(name),
+      );
+      return stored ? (JSON.parse(stored) as OpenAPIObject) : null;
+    },
+    set: async (name: string, openApiDoc: OpenAPIObject) => {
+      await this.redisService.redis.set(
+        this.generateOpenApiDocKey(name),
+        JSON.stringify(openApiDoc),
+      );
+    },
+  };
+
+  private readonly serviceRegistryRecord = {
+    get: async ({ name }: TRegistrationRequest) => {
+      const stored = await this.redisService.redis.get(
+        this.generateServiceRegistryKey(name),
+      );
+      return stored ? (JSON.parse(stored) as IServiceRecord) : null;
+    },
+  };
 
   getHello(): string {
     return 'Hello World!';
@@ -40,11 +70,25 @@ export class AppService {
       .map(this.deserializeServiceRegistrationKey)
       .filter(({ name, host, port }) => name && host && port);
 
-    const openApiDocs = (
-      await Promise.all(registryRequests.map(this.processRegistrationRequest))
-    ).filter((openApiDoc) => openApiDoc);
+    const openApiDocs = await Promise.all(
+      registryRequests.map(this.fetchServiceOpenApiDoc),
+    );
 
-    console.log('openApiDocs', openApiDocs);
+    const uniqueOpenApiDocs = Array.from(
+      new Map(
+        openApiDocs
+          .filter((doc) => doc !== null)
+          .map((doc) => [doc.service, doc]),
+      ).values(),
+    );
+
+    await Promise.all(
+      uniqueOpenApiDocs.map(({ service, doc }) =>
+        this.openApiDoc.set(service, doc),
+      ),
+    );
+
+    console.log('openApiDocs', uniqueOpenApiDocs);
   }
 
   private readonly deserializeServiceRegistrationKey = (
@@ -54,7 +98,7 @@ export class AppService {
     return { name, host, port: parseInt(port, 10) };
   };
 
-  private readonly processRegistrationRequest = async ({
+  private readonly fetchServiceOpenApiDoc = async ({
     name,
     host,
     port,
@@ -66,7 +110,8 @@ export class AppService {
         signal: AbortSignal.timeout(5000),
       });
       const openApiDoc = (await res.json()) as OpenAPIObject;
-      return openApiDoc;
+
+      return { service: name, doc: openApiDoc };
     } catch (e) {
       console.warn(
         `Failed to fetch service ${name} openapi doc by ${serviceOpenApiDocUrl}`,
@@ -74,6 +119,11 @@ export class AppService {
       );
       return null;
     }
+  };
+
+  private readonly processOpenApiDocs = async () => {
+    const openApiDocs = await this.redisService.keys(`${this.openApiDocKey}:*`);
+    console.log(openApiDocs);
   };
 }
 

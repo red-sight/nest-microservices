@@ -8,7 +8,8 @@
     "start:dev": {
       "dependsOn": ["^build"],
       "persistent": true,
-      "cache": false
+      "cache": false,
+      "interruptible": true
     }
   }
 }

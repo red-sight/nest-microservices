@@ -1,9 +1,15 @@
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
-import { EQueueRegistry, IRegistryRequest, IServiceRecord } from '@lib/types';
+import {
+  EQueueRegistry,
+  ERegistryStoreKey,
+  IRegistryRequest,
+  IServiceRecord,
+} from '@lib/types';
 import { RedisService } from '@lib/nest';
 import { OpenAPIObject } from '@nestjs/swagger';
-import { merge } from 'openapi-merge';
+import { isErrorResult, merge } from 'openapi-merge';
+import { configShared } from '@lib/config-shared';
 
 @Processor(EQueueRegistry.registryRequests)
 export class RegistryRequestsConsumer extends WorkerHost {
@@ -79,7 +85,7 @@ export class RegistryRequestsConsumer extends WorkerHost {
       )
     ).filter((d) => d !== null);
 
-    const fullOpenApiDoc = merge(
+    const mergeResult = merge(
       docs.map(({ service, doc }) => ({
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         oas: doc as any,
@@ -87,7 +93,21 @@ export class RegistryRequestsConsumer extends WorkerHost {
       })),
     );
 
-    console.log(fullOpenApiDoc);
+    if (isErrorResult(mergeResult)) {
+      console.error('Failed to merge OpenAPI doc');
+      return;
+    }
+
+    const fullOpenApiDoc = mergeResult.output;
+
+    fullOpenApiDoc.info.title = configShared.data.appTitle;
+    fullOpenApiDoc.info.description = configShared.data.appDescription;
+    fullOpenApiDoc.info.version = configShared.data.appVersion;
+
+    await this.redisService.redis.set(
+      ERegistryStoreKey.openApiDoc,
+      JSON.stringify(fullOpenApiDoc),
+    );
 
     console.log(
       'Worker is drained ========================================================================',

@@ -21,6 +21,12 @@ export interface IConfig<
     | KafkaOptions
     | CustomStrategy,
 > {
+  appTitle: string;
+
+  appDescription: string;
+
+  appVersion: string;
+
   redisOptions: RedisOptions;
 
   microserviceOptions: T;

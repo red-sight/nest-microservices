@@ -11,3 +11,7 @@ export interface IRegistryRequest {
 export interface IServiceRecord extends IRegistryRequest {
   alive: boolean;
 }
+
+export enum ERegistryStoreKey {
+  openApiDoc = "openapidoc",
+}

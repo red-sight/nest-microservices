@@ -61,10 +61,9 @@ function configureSwagger(
 ): OpenAPIObject {
   const config = new DocumentBuilder()
     .setTitle(serviceName)
-    .setDescription("API description")
-    .setVersion("1.0")
+    .addTag(serviceName)
+    .setVersion(configShared.data.appVersion)
     .build();
-
   const documentFactory = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, documentFactory);
   return documentFactory;

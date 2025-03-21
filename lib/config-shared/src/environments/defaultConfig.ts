@@ -5,6 +5,9 @@ import { VersioningType } from "@nestjs/common";
 
 const appCode = getEnvVar("APP_CODE") ?? "app-code";
 const packageName = getEnvVarOrThrow("npm_package_name");
+const appTitle = getEnvVar("APP_TITLE") ?? "Nest microservices application";
+const appDescription = getEnvVar("APP_DESCRIPTION") ?? "App description";
+const appVersion = getEnvVar("APP_VERSION") ?? "1";
 
 const microserviceOptions: RmqOptions = {
   transport: Transport.RMQ,
@@ -31,6 +34,10 @@ const microserviceOptions: RmqOptions = {
 // };
 
 export const defaultConfig: IConfig<RmqOptions> = {
+  appTitle,
+  appDescription,
+  appVersion,
+
   redisOptions: {
     keyPrefix: appCode,
   },
@@ -51,7 +58,7 @@ export const defaultConfig: IConfig<RmqOptions> = {
 
   versioning: {
     type: VersioningType.URI,
-    defaultVersion: "1",
+    defaultVersion: appVersion,
   },
 
   validationPipeOptions: {},

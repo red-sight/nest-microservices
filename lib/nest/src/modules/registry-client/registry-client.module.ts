@@ -17,18 +17,18 @@ export class RegistryClientModule implements OnModuleInit {
 
   static register() {
     return {
-      module: RegistryClientModule,
+      exports: [],
       imports: [
         BullModule.forRoot({
           connection: bullmqRedisOpts,
         }),
         BullModule.registerQueue({
-          name: EQueueRegistry.registryRequests,
           connection: bullmqRedisOpts,
+          name: EQueueRegistry.registryRequests,
         }),
       ],
+      module: RegistryClientModule,
       providers: [],
-      exports: [],
     };
   }
 
@@ -36,9 +36,9 @@ export class RegistryClientModule implements OnModuleInit {
     console.log("In registry client OnModuleInit");
 
     const registerOptions: IRegistryRequest = {
-      service: getEnvVarOrThrow("npm_package_name"),
-      port: getEnvVarOrThrow("HTTP_PORT"),
       host: getEnvVar("HOST") ?? "localhost",
+      port: getEnvVarOrThrow("HTTP_PORT"),
+      service: getEnvVarOrThrow("npm_package_name"),
     };
 
     await this.registryRequestsQueue.add(
@@ -47,8 +47,8 @@ export class RegistryClientModule implements OnModuleInit {
       {
         attempts: 5,
         backoff: {
-          type: "exponential",
           delay: 1000,
+          type: "exponential",
         },
         removeOnComplete: true,
         removeOnFail: true,

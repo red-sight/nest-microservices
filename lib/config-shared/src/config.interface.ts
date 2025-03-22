@@ -1,4 +1,4 @@
-import { RedisOptions } from "ioredis";
+import { ValidationPipeOptions, VersioningOptions } from "@nestjs/common";
 import {
   CustomStrategy,
   GrpcOptions,
@@ -8,7 +8,7 @@ import {
   RmqOptions,
   TcpOptions,
 } from "@nestjs/microservices";
-import { ValidationPipeOptions, VersioningOptions } from "@nestjs/common";
+import { RedisOptions } from "ioredis";
 
 export interface IConfig<
   T =
@@ -21,19 +21,19 @@ export interface IConfig<
     | KafkaOptions
     | CustomStrategy,
 > {
-  appTitle: string;
-
   appDescription: string;
 
-  appVersion: string;
+  appTitle: string;
 
-  redisOptions: RedisOptions;
+  appVersion: string;
 
   microserviceOptions: T;
 
   microserviceRegistryClientOptions: T;
 
-  versioning: VersioningOptions;
+  redisOptions: RedisOptions;
 
   validationPipeOptions: ValidationPipeOptions;
+
+  versioning: VersioningOptions;
 }

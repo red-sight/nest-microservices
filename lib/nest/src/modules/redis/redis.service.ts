@@ -1,7 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
 import Redis, { RedisOptions } from "ioredis";
-import { getMappedRedisKeys, mapRedisOptions } from "./redis-utils";
+
 import { EInjectionTokens } from "../../types";
+import { getMappedRedisKeys, mapRedisOptions } from "./redis-utils";
 
 @Injectable()
 export class RedisService {

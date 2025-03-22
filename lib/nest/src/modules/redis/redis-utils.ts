@@ -13,6 +13,6 @@ export const getMappedRedisKeys = async (
   pattern: string,
 ): Promise<string[]> => {
   return (await redis.keys(`${redis.options.keyPrefix ?? ""}${pattern}`)).map(
-    (key) => key.split(":").splice(1).join(":"),
+    key => key.split(":").splice(1).join(":"),
   );
 };

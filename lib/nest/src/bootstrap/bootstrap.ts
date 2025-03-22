@@ -5,19 +5,19 @@ import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, OpenAPIObject, SwaggerModule } from "@nestjs/swagger";
 
 export interface IBootstrapOpts {
-  enableVersioning?: boolean;
-  enableValidationPipe?: boolean;
-  enableMicroservice?: boolean;
   enableHttpService?: boolean;
+  enableMicroservice?: boolean;
+  enableValidationPipe?: boolean;
+  enableVersioning?: boolean;
 }
 
 export async function bootstrap(
   AppModule: Type<unknown>,
   {
-    enableVersioning = true,
-    enableValidationPipe = true,
-    enableMicroservice = true,
     enableHttpService = true,
+    enableMicroservice = true,
+    enableValidationPipe = true,
+    enableVersioning = true,
   }: IBootstrapOpts = {},
 ): Promise<{ app: INestApplication }> {
   const serviceName = getEnvVarOrThrow("npm_package_name");

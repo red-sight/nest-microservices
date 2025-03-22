@@ -1,10 +1,11 @@
+import { getEnvVarOrThrow } from "@lib/config";
+import { configShared } from "@lib/config-shared";
 import { EMessagePatternRegistry } from "@lib/types";
 import { Inject, Module, OnApplicationBootstrap } from "@nestjs/common";
 import { ClientProxy, ClientsModule } from "@nestjs/microservices";
-import { EInjectionTokens } from "../../types";
-import { configShared } from "@lib/config-shared";
-import { getEnvVarOrThrow } from "@lib/config";
 import { firstValueFrom } from "rxjs";
+
+import { EInjectionTokens } from "../../types";
 
 @Module({})
 export class RegistryClientModuleSav implements OnApplicationBootstrap {
@@ -20,10 +21,10 @@ export class RegistryClientModuleSav implements OnApplicationBootstrap {
     };
 
     return {
-      module: RegistryClientModuleSav,
-      imports: [ClientsModule.register([registryClientOptions])],
-      providers: [],
       exports: [ClientsModule],
+      imports: [ClientsModule.register([registryClientOptions])],
+      module: RegistryClientModuleSav,
+      providers: [],
     };
   }
 
@@ -32,9 +33,9 @@ export class RegistryClientModuleSav implements OnApplicationBootstrap {
     console.log("Connected to broker");
 
     const registerOptions = {
+      host: "localhost",
       name: getEnvVarOrThrow("npm_package_name"),
       port: getEnvVarOrThrow("HTTP_PORT"),
-      host: "localhost",
     };
 
     void firstValueFrom(

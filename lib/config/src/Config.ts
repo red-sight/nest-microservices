@@ -7,6 +7,11 @@ if (!pwd) throw new Error("Couldn't find workspace path");
 if (!cwd) throw new Error("Couldn't find project root path");
 dotenv.config({ path: [join(pwd, ".env"), join(cwd, ".env")] });
 
+export interface IConfigEnvironments<T> {
+  [key: string]: Partial<T>;
+  defaultConfig: T;
+}
+
 export class Config<T> {
   public readonly data: T;
 
@@ -21,9 +26,4 @@ export class Config<T> {
       };
     this.data = config;
   }
-}
-
-export interface IConfigEnvironments<T> {
-  defaultConfig: T;
-  [key: string]: Partial<T>;
 }

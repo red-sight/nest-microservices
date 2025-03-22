@@ -1,0 +1,30 @@
+{
+  "name": "@lib/lint",
+  "packageManager": "yarn@4.2.2",
+  "scripts": {
+    "lint:fix": "eslint --fix",
+    "lint": "eslint"
+  },
+  "exports": {
+    "./js": "./eslint-js.config.mjs",
+    "./ts": "./eslint-ts.config.mjs",
+    "./prettier": "./prettier.config.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@lib/typescript-config": "workspace:^",
+    "@types/eslint__js": "^9.14.0",
+    "@typescript-eslint/eslint-plugin": "^8.27.0",
+    "@typescript-eslint/parser": "^8.27.0",
+    "eslint": "^9.22.0",
+    "eslint-plugin-chai-friendly": "^1.0.1",
+    "eslint-plugin-jest": "^28.11.0",
+    "eslint-plugin-mocha": "^10.5.0",
+    "eslint-plugin-perfectionist": "^4.10.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "globals": "^16.0.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.27.0"
+  }
+}

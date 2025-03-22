@@ -1,8 +1,9 @@
-import { Controller, UsePipes, ValidationPipe } from '@nestjs/common';
-import { AppService } from './app.service';
-import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
-import { RegisterOptionsDto } from '@lib/nest';
-import { EMessagePatternRegistry } from '@lib/types';
+import { RegisterOptionsDto } from "@lib/nest";
+import { EMessagePatternRegistry } from "@lib/types";
+import { Controller, UsePipes, ValidationPipe } from "@nestjs/common";
+import { MessagePattern, Payload, RpcException } from "@nestjs/microservices";
+
+import { AppService } from "./app.service";
 
 @Controller()
 export class AppController {
@@ -11,7 +12,7 @@ export class AppController {
   @MessagePattern(EMessagePatternRegistry.registrationRequest)
   @UsePipes(
     new ValidationPipe({
-      exceptionFactory: (errors) => new RpcException(errors),
+      exceptionFactory: errors => new RpcException(errors),
     }),
   )
   register(@Payload() registerOptions: RegisterOptionsDto) {

@@ -1,24 +1,24 @@
-import { OpenAPIObject } from '@nestjs/swagger';
-import { RedisService, RegisterOptionsDto } from '@lib/nest';
-import { Injectable } from '@nestjs/common';
+import { RedisService, RegisterOptionsDto } from "@lib/nest";
+import { Injectable } from "@nestjs/common";
+import { OpenAPIObject } from "@nestjs/swagger";
 
 @Injectable()
 export class AppService {
   constructor(private readonly redisService: RedisService) {}
 
-  private readonly serviceRegistryKey = 'registry:service';
+  private readonly serviceRegistryKey = "registry:service";
 
-  private readonly registrationRequestKey = 'registration-request';
+  private readonly registrationRequestKey = "registration-request";
 
-  private readonly openApiDocKey = 'openapi-doc';
+  private readonly openApiDocKey = "openapi-doc";
 
   private readonly generateServiceRegistryKey = (name: string) => {
     return `${this.serviceRegistryKey}:${name}`;
   };
 
   private generateServiceRegistrationRequestKey({
-    name,
     host,
+    name,
     port,
   }: RegisterOptionsDto) {
     return `${this.registrationRequestKey}:${name}:${host}:${port}`;
@@ -53,13 +53,13 @@ export class AppService {
   };
 
   getHello(): string {
-    return 'Hello World!';
+    return "Hello World!";
   }
 
   async registrationRequest(opts: RegisterOptionsDto) {
     await this.redisService.redis.set(
       this.generateServiceRegistrationRequestKey(opts),
-      'true',
+      "true",
     );
   }
 
@@ -68,7 +68,7 @@ export class AppService {
       await this.redisService.keys(`${this.registrationRequestKey}:*`)
     )
       .map(this.deserializeServiceRegistrationKey)
-      .filter(({ name, host, port }) => name && host && port);
+      .filter(({ host, name, port }) => name && host && port);
 
     const openApiDocs = await Promise.all(
       registryRequests.map(this.fetchServiceOpenApiDoc),
@@ -76,34 +76,32 @@ export class AppService {
 
     const uniqueOpenApiDocs = Array.from(
       new Map(
-        openApiDocs
-          .filter((doc) => doc !== null)
-          .map((doc) => [doc.service, doc]),
+        openApiDocs.filter(doc => doc !== null).map(doc => [doc.service, doc]),
       ).values(),
     );
 
     await Promise.all(
-      uniqueOpenApiDocs.map(({ service, doc }) =>
+      uniqueOpenApiDocs.map(({ doc, service }) =>
         this.openApiDoc.set(service, doc),
       ),
     );
 
-    console.log('openApiDocs', uniqueOpenApiDocs);
+    console.log("openApiDocs", uniqueOpenApiDocs);
   }
 
   private readonly deserializeServiceRegistrationKey = (
     key: string,
   ): TRegistrationRequest => {
-    const [, name, host, port] = key.split(':');
-    return { name, host, port: parseInt(port, 10) };
+    const [, name, host, port] = key.split(":");
+    return { host, name, port: parseInt(port, 10) };
   };
 
   private readonly fetchServiceOpenApiDoc = async ({
-    name,
     host,
+    name,
     port,
   }: TRegistrationRequest) => {
-    const serviceOpenApiDocUrl = `http://${host}:${port}/api-json`;
+    const serviceOpenApiDocUrl = `http://${host}:${port.toString()}/api-json`;
     console.log(serviceOpenApiDocUrl);
     try {
       const res = await fetch(serviceOpenApiDocUrl, {
@@ -111,7 +109,7 @@ export class AppService {
       });
       const openApiDoc = (await res.json()) as OpenAPIObject;
 
-      return { service: name, doc: openApiDoc };
+      return { doc: openApiDoc, service: name };
     } catch (e) {
       console.warn(
         `Failed to fetch service ${name} openapi doc by ${serviceOpenApiDocUrl}`,
@@ -128,11 +126,11 @@ export class AppService {
 }
 
 interface IServiceRecord {
-  name: string;
-  host: string;
-  port: number;
   alive: boolean;
+  host: string;
+  name: string;
+  port: number;
   registered: boolean;
 }
 
-type TRegistrationRequest = Omit<IServiceRecord, 'alive' | 'registered'>;
+type TRegistrationRequest = Omit<IServiceRecord, "alive" | "registered">;

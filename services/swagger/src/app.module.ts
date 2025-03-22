@@ -1,12 +1,13 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { RedisModule } from '@lib/nest';
-import { configShared } from '@lib/config-shared';
+import { configShared } from "@lib/config-shared";
+import { RedisModule } from "@lib/nest";
+import { Module } from "@nestjs/common";
+
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
 
 @Module({
-  imports: [RedisModule.register(configShared.data.redisOptions)],
   controllers: [AppController],
+  imports: [RedisModule.register(configShared.data.redisOptions)],
   providers: [AppService],
 })
 export class AppModule {}

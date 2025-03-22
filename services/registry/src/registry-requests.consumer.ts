@@ -1,15 +1,15 @@
-import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
-import { Job } from 'bullmq';
+import { configShared } from "@lib/config-shared";
+import { RedisService } from "@lib/nest";
 import {
   EQueueRegistry,
   ERegistryStoreKey,
   IRegistryRequest,
   IServiceRecord,
-} from '@lib/types';
-import { RedisService } from '@lib/nest';
-import { OpenAPIObject } from '@nestjs/swagger';
-import { isErrorResult, merge } from 'openapi-merge';
-import { configShared } from '@lib/config-shared';
+} from "@lib/types";
+import { OnWorkerEvent, Processor, WorkerHost } from "@nestjs/bullmq";
+import { OpenAPIObject } from "@nestjs/swagger";
+import { Job } from "bullmq";
+import { isErrorResult, merge } from "openapi-merge";
 
 @Processor(EQueueRegistry.registryRequests)
 export class RegistryRequestsConsumer extends WorkerHost {
@@ -17,7 +17,7 @@ export class RegistryRequestsConsumer extends WorkerHost {
     super();
   }
 
-  private readonly openApiDocKey = 'registry:doc';
+  private readonly openApiDocKey = "registry:doc";
   private readonly genOpenApiDocKey = (service: string): string =>
     `${this.openApiDocKey}:${service}`;
   private readonly openApiDoc = {
@@ -35,7 +35,7 @@ export class RegistryRequestsConsumer extends WorkerHost {
     },
   };
 
-  private readonly serviceRecordKey = 'registry:service';
+  private readonly serviceRecordKey = "registry:service";
   private readonly genServiceRecordKey = (service: string): string =>
     `${this.serviceRecordKey}:${service}`;
   private readonly serviceRecord = {
@@ -53,7 +53,7 @@ export class RegistryRequestsConsumer extends WorkerHost {
     },
   };
 
-  async process(job: Job<IRegistryRequest, any, string>): Promise<any> {
+  async process(job: Job<IRegistryRequest>): Promise<void> {
     const { host, port, service } = job.data;
     const serviceOpenApiDocUrl = `http://${host}:${port}/api-json`;
 
@@ -70,31 +70,31 @@ export class RegistryRequestsConsumer extends WorkerHost {
     });
   }
 
-  @OnWorkerEvent('drained')
+  @OnWorkerEvent("drained")
   async onCompleted() {
     const keys = await this.redisService.keys(`${this.serviceRecordKey}:*`);
 
     const docs = (
       await Promise.all(
-        keys.map(async (key) => {
-          const [, , service] = key.split(':');
+        keys.map(async key => {
+          const [, , service] = key.split(":");
           const doc = await this.openApiDoc.get(service);
           if (!doc) return null;
-          return { service, doc };
+          return { doc, service };
         }),
       )
-    ).filter((d) => d !== null);
+    ).filter(d => d !== null);
 
     const mergeResult = merge(
-      docs.map(({ service, doc }) => ({
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      docs.map(({ doc, service }) => ({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
         oas: doc as any,
         pathModification: { prepend: `/${service}` },
       })),
     );
 
     if (isErrorResult(mergeResult)) {
-      console.error('Failed to merge OpenAPI doc');
+      console.error("Failed to merge OpenAPI doc");
       return;
     }
 
@@ -110,7 +110,7 @@ export class RegistryRequestsConsumer extends WorkerHost {
     );
 
     console.log(
-      'Worker is drained ========================================================================',
+      "Worker is drained ========================================================================",
     );
   }
 }

@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class AppService {
-  constructor() {}
+  // constructor() {}
   // @Inject(EInjectionTokens.REGISTRY_SERVICE)
   // private readonly client: ClientProxy,
 
@@ -18,6 +18,6 @@ export class AppService {
     //   console.dir(data, { depth: null, colors: true });
     // });
     // return { message: 'Register request is being sent', registerOptions };
-    return 'hello';
+    return "hello";
   }
 }

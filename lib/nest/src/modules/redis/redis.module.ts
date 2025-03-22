@@ -5,7 +5,6 @@ import { EInjectionTokens } from "../../types";
 import { RedisService } from "./redis.service";
 
 @Module({})
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class RedisModule {
   static register(options: RedisOptions): DynamicModule {
     return {

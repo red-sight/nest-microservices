@@ -18,6 +18,6 @@ export class AppService {
     //   console.dir(data, { depth: null, colors: true });
     // });
     // return { message: 'Register request is being sent', registerOptions };
-    return "hello";
+    return { message: "hello" };
   }
 }

@@ -17,6 +17,11 @@ export class AppController {
   aaa() {
     console.log("In aaa");
 
-    return "AAAAAAA";
+    return { response: "AAAAAAA" };
+  }
+
+  @Get("new_one2")
+  newApi() {
+    return { new: "bar" };
   }
 }

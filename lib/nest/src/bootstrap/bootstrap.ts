@@ -45,7 +45,7 @@ export async function bootstrap(
     const httpPort = getEnvVarOrThrow("HTTP_PORT");
     if (enableVersioning) app.enableVersioning(configShared.data.versioning);
     configureSwagger(app, serviceName);
-    await app.listen(httpPort, () => {
+    await app.listen(httpPort, "0.0.0.0", () => {
       console.log(
         `🌍 HTTP application ${serviceName} is accepting connections on port ${httpPort}`,
       );

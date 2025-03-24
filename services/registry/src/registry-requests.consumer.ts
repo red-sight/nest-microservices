@@ -1,14 +1,19 @@
+import { getEnvVarOrThrow } from "@lib/config";
 import { configShared } from "@lib/config-shared";
 import { RedisService } from "@lib/nest";
 import {
+  EKrakendHttpMethod,
   EQueueRegistry,
   ERegistryStoreKey,
+  IKrakendEndpoint,
   IRegistryRequest,
   IServiceRecord,
 } from "@lib/types";
 import { OnWorkerEvent, Processor, WorkerHost } from "@nestjs/bullmq";
 import { OpenAPIObject } from "@nestjs/swagger";
 import { Job } from "bullmq";
+import { writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { isErrorResult, merge } from "openapi-merge";
 
 @Processor(EQueueRegistry.registryRequests)
@@ -109,8 +114,77 @@ export class RegistryRequestsConsumer extends WorkerHost {
       JSON.stringify(fullOpenApiDoc),
     );
 
+    const endpoints = await this.saveKrakendConfig(docs);
+    console.dir(endpoints, { colors: true, depth: null });
+
     console.log(
       "Worker is drained ========================================================================",
     );
   }
+
+  private readonly saveKrakendConfig = async (
+    docs: { doc: OpenAPIObject; service: string }[],
+  ) => {
+    const endpoints: IKrakendEndpoint[] = (
+      await Promise.all(
+        docs.map(async ({ doc, service }) => {
+          const hosts = (await this.getServiceRecords({ service })).map(
+            ({ host, port }) =>
+              `http://${host === "localhost" ? "host.docker.internal" : host}:${port}`,
+          );
+
+          return Object.keys(doc.paths)
+            .map(key => {
+              return Object.keys(doc.paths[key]).map(method => ({
+                backend: [{ host: hosts, url_pattern: key }],
+                endpoint: join("/", service, key),
+                method:
+                  method &&
+                  Object.keys(EKrakendHttpMethod).includes(method.toUpperCase())
+                    ? (method.toUpperCase() as EKrakendHttpMethod)
+                    : EKrakendHttpMethod.GET,
+              }));
+            })
+            .flat();
+        }),
+      )
+    ).flat();
+
+    const krakendConfig = {
+      endpoints,
+      version: "3",
+    };
+
+    await writeFile(
+      join(getEnvVarOrThrow("PWD"), "krakend/krakend.json"),
+      JSON.stringify(krakendConfig, null, 2),
+    );
+
+    return endpoints;
+  };
+
+  private readonly getServiceRecords = async ({
+    alive,
+    service,
+  }: {
+    alive?: boolean;
+    service?: string;
+  }) => {
+    const keys = await this.redisService.keys(
+      `${this.serviceRecordKey}:${service ?? "*"}`,
+    );
+
+    const records = (
+      await Promise.all(
+        keys.map(async key => {
+          const record = await this.redisService.redis.get(key);
+          if (record) return JSON.parse(record) as IServiceRecord;
+        }),
+      )
+    ).filter(record => record !== undefined);
+
+    if (alive) return records.filter(({ alive }) => !!alive);
+
+    return records;
+  };
 }

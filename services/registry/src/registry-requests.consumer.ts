@@ -33,6 +33,7 @@ export class RegistryRequestsConsumer extends WorkerHost {
       return stored ? (JSON.parse(stored) as OpenAPIObject) : null;
     },
     set: async (service: string, openApiDoc: OpenAPIObject): Promise<void> => {
+      console.log("In set", service, openApiDoc);
       await this.redisService.redis.set(
         this.genOpenApiDocKey(service),
         JSON.stringify(openApiDoc),
@@ -41,54 +42,94 @@ export class RegistryRequestsConsumer extends WorkerHost {
   };
 
   private readonly serviceRecordKey = "registry:service";
-  private readonly genServiceRecordKey = (service: string): string =>
-    `${this.serviceRecordKey}:${service}`;
+  private readonly genServiceRecordKey = ({
+    host,
+    port,
+    service,
+  }: IServiceRecord): string =>
+    `${this.serviceRecordKey}:${service}:${host}:${port}`;
   private readonly serviceRecord = {
-    get: async (service: string): Promise<IServiceRecord | null> => {
-      const stored = await this.redisService.redis.get(
-        this.genServiceRecordKey(service),
+    getAll: async (opts: {
+      alive?: boolean;
+      host?: string;
+      port?: string;
+      service?: string;
+    }): Promise<IServiceRecord[]> => {
+      // const stored = await this.redisService.redis.get(
+      //   this.genServiceRecordKey(service),
+      // );
+      // return stored ? (JSON.parse(stored) as IServiceRecord) : null;
+      const { alive, host, port, service } = opts;
+      const keys = await this.redisService.keys(
+        `${this.serviceRecordKey}:${service ?? "*"}:${host ?? "*"}:${port ?? "*"}`,
       );
-      return stored ? (JSON.parse(stored) as IServiceRecord) : null;
+
+      const records = (
+        await Promise.all(
+          keys.map(async key => {
+            const record = await this.redisService.redis.get(key);
+            if (record) return JSON.parse(record) as IServiceRecord;
+          }),
+        )
+      ).filter(record => record !== undefined);
+
+      if (alive) return records.filter(({ alive }) => !!alive);
+
+      return records;
     },
-    set: async (service: string, record: IServiceRecord): Promise<void> => {
-      await this.redisService.redis.set(
-        this.genServiceRecordKey(service),
-        JSON.stringify(record),
-      );
+    set: async (record: IServiceRecord): Promise<void> => {
+      const key = this.genServiceRecordKey(record);
+      await this.redisService.redis.set(key, JSON.stringify(record));
     },
   };
 
   async process(job: Job<IRegistryRequest>): Promise<void> {
-    const { host, port, service } = job.data;
-    const serviceOpenApiDocUrl = `http://${host}:${port}/api-json`;
+    try {
+      const { host, port, service } = job.data;
+      console.log("In process", job.data);
+      const serviceOpenApiDocUrl = `http://${host}:${port}/api-json`;
 
-    const res = await fetch(serviceOpenApiDocUrl, {
-      signal: AbortSignal.timeout(5000),
-    });
+      const res = await fetch(serviceOpenApiDocUrl, {
+        signal: AbortSignal.timeout(5000),
+      });
 
-    const openApiDoc = (await res.json()) as OpenAPIObject;
-    await this.openApiDoc.set(service, openApiDoc);
+      const openApiDoc = (await res.json()) as OpenAPIObject;
+      await this.openApiDoc.set(service, openApiDoc);
 
-    await this.serviceRecord.set(service, {
-      ...job.data,
-      alive: true,
-    });
+      await this.serviceRecord.set({
+        ...job.data,
+        alive: true,
+      });
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   @OnWorkerEvent("drained")
   async onCompleted() {
-    const keys = await this.redisService.keys(`${this.serviceRecordKey}:*`);
+    const allServiceRecords = (
+      await this.redisService.keys(`${this.serviceRecordKey}:*`)
+    ).map(key => {
+      const [, , service, host, port] = key.split(":");
+      return { host, port, service };
+    });
+
+    const servicesList = Array.from(
+      new Map(allServiceRecords.map(i => [i.service, i])).values(),
+    );
 
     const docs = (
       await Promise.all(
-        keys.map(async key => {
-          const [, , service] = key.split(":");
+        servicesList.map(async record => {
+          const { service } = record;
           const doc = await this.openApiDoc.get(service);
           if (!doc) return null;
           return { doc, service };
         }),
       )
     ).filter(d => d !== null);
+
+    console.log(docs);
 
     const mergeResult = merge(
       docs.map(({ doc, service }) => ({
@@ -128,7 +169,7 @@ export class RegistryRequestsConsumer extends WorkerHost {
     const endpoints: IKrakendEndpoint[] = (
       await Promise.all(
         docs.map(async ({ doc, service }) => {
-          const hosts = (await this.getServiceRecords({ service })).map(
+          const hosts = (await this.serviceRecord.getAll({ service })).map(
             ({ host, port }) =>
               `http://${host === "localhost" ? "host.docker.internal" : host}:${port}`,
           );
@@ -161,30 +202,5 @@ export class RegistryRequestsConsumer extends WorkerHost {
     );
 
     return endpoints;
-  };
-
-  private readonly getServiceRecords = async ({
-    alive,
-    service,
-  }: {
-    alive?: boolean;
-    service?: string;
-  }) => {
-    const keys = await this.redisService.keys(
-      `${this.serviceRecordKey}:${service ?? "*"}`,
-    );
-
-    const records = (
-      await Promise.all(
-        keys.map(async key => {
-          const record = await this.redisService.redis.get(key);
-          if (record) return JSON.parse(record) as IServiceRecord;
-        }),
-      )
-    ).filter(record => record !== undefined);
-
-    if (alive) return records.filter(({ alive }) => !!alive);
-
-    return records;
   };
 }

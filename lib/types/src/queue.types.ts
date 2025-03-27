@@ -1,5 +1,6 @@
 export enum EQueueRegistry {
   registryRequests = "registry.requests",
+  serviceHealthCheck = "registry.service.health",
 }
 
 export enum ERegistryStoreKey {

@@ -3,7 +3,7 @@ import { IsNotEmpty, IsPort, IsString } from "class-validator";
 export class RegisterOptionsDto {
   @IsNotEmpty()
   @IsString()
-  name: string;
+  service: string;
 
   @IsNotEmpty()
   @IsString()

@@ -17,7 +17,6 @@ export class AppController {
   @Post("/signin")
   aaa(@Body() { name, password }: MethodADto) {
     console.log("in signin", name, password);
-
     return { response: "AAAAAAA" };
   }
 

@@ -13,7 +13,6 @@ export class KrakendGatewayProvider implements GatewayProvider {
     const endpoints: IKrakendEndpoint[] = docs
       .map(({ doc, hosts, service }) => {
         console.log(service, hosts);
-        console.dir(doc, { colors: true, depth: null });
         if (doc.paths === undefined) return;
         return Object.keys(doc.paths)
           .map(key => {

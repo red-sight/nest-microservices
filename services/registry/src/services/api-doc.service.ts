@@ -40,7 +40,18 @@ export class ApiDocService {
     service: string,
   ): Promise<OpenAPI.Document | undefined> => {
     const key = this.generateKey(service);
-    return await this.redisService.get<OpenAPI.Document>(key);
+    const doc = await this.redisService.get<OpenAPI.Document>(key);
+    if (doc && doc.paths) {
+      for (const key of Object.keys(doc.paths)) {
+        if (doc.paths[key] && typeof doc.paths[key] === "object") {
+          for (const method of Object.keys(doc.paths[key])) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            doc.paths[key][method].tags = [service];
+          }
+        }
+      }
+    }
+    return doc;
   };
 
   readonly getAll = async (

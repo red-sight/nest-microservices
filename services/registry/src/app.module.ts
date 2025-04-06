@@ -6,7 +6,7 @@ import { OnApplicationBootstrap } from "@nestjs/common";
 import { Module } from "@nestjs/common";
 import { Queue } from "bullmq";
 
-import { RegistryRequestsConsumer } from "./consumers";
+import { HealthCheckConsumer, RegistryRequestsConsumer } from "./consumers";
 import {
   ApiDocService,
   KrakendGatewayProvider,
@@ -36,6 +36,7 @@ const { keyPrefix, ...bullmqRedisOpts } = configShared.data.redisOptions;
     ApiDocService,
     ServiceRecordService,
     KrakendGatewayProvider,
+    HealthCheckConsumer,
   ],
 })
 export class AppModule implements OnApplicationBootstrap {

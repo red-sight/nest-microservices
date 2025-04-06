@@ -1,6 +1,5 @@
 import { RedisService, RegisterOptionsDto } from "@lib/nest";
 import { Injectable } from "@nestjs/common";
-import { ServiceRecordDto } from "src/dtos";
 
 @Injectable()
 export class ServiceRecordService {
@@ -18,10 +17,10 @@ export class ServiceRecordService {
 
   readonly get = async (
     opts: RegisterOptionsDto,
-  ): Promise<ServiceRecordDto | undefined> => {
+  ): Promise<RegisterOptionsDto | undefined> => {
     const key = this.generateKey(opts);
-    return await this.redisService.get<ServiceRecordDto>(key, {
-      dto: ServiceRecordDto,
+    return await this.redisService.get<RegisterOptionsDto>(key, {
+      dto: RegisterOptionsDto,
     });
   };
 
@@ -32,23 +31,23 @@ export class ServiceRecordService {
       port?: string;
       service?: string;
     } = {},
-  ): Promise<ServiceRecordDto[]> => {
+  ): Promise<RegisterOptionsDto[]> => {
     const { alive = false, host = "*", port = "*", service = "*" } = opts;
     const key = this.generateKey({ host, port, service });
     return (
-      await this.redisService.getAll<ServiceRecordDto>(key, {
-        dto: ServiceRecordDto,
+      await this.redisService.getAll<RegisterOptionsDto>(key, {
+        dto: RegisterOptionsDto,
       })
     ).filter(dto => (alive ? dto.alive === true : true));
   };
 
-  readonly set = async (dto: ServiceRecordDto): Promise<void> => {
+  readonly set = async (dto: RegisterOptionsDto): Promise<void> => {
     const key = this.generateKey(dto);
     await this.redisService.redis.set(key, JSON.stringify(dto));
   };
 
   readonly getServicesList = async (): Promise<IServiceListItem[]> => {
-    const allServicesRecords = await this.getAll();
+    const allServicesRecords = await this.getAll({ alive: true });
     const uniqueServices = Array.from(
       new Map(allServicesRecords.map(i => [i.service, i])).values(),
     );

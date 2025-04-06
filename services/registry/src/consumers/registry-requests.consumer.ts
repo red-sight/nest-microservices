@@ -29,12 +29,15 @@ export class RegistryRequestsConsumer extends WorkerHost {
         `Registry request data is invalid: ${JSON.stringify(errors, null, 2)}`,
       );
 
-    const { host, port, service } = dto;
-    const openApiDoc = await this.apiDocService.fetch(dto);
+    const { alive = true, host, port, service } = dto;
 
-    await this.apiDocService.set(service, openApiDoc);
+    if (alive) {
+      const openApiDoc = await this.apiDocService.fetch(dto);
+      await this.apiDocService.set(service, openApiDoc);
+    }
+
     await this.serviceRecord.set({
-      alive: true,
+      alive: !!alive,
       host,
       port,
       service,

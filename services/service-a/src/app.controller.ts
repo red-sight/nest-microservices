@@ -1,6 +1,7 @@
-import { Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Post } from "@nestjs/common";
 
 import { AppService } from "./app.service";
+import { MethodADto } from "./dtos/MethodA.dto";
 
 @Controller()
 export class AppController {
@@ -13,9 +14,9 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Post("/bye")
-  aaa() {
-    console.log("In aaa");
+  @Post("/signin")
+  aaa(@Body() { name, password }: MethodADto) {
+    console.log("in signin", name, password);
 
     return { response: "AAAAAAA" };
   }

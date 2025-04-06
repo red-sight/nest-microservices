@@ -1,10 +1,9 @@
 import { configShared } from "@lib/config-shared";
-import { RedisService } from "@lib/nest";
+import { RedisService, RegisterOptionsDto } from "@lib/nest";
 import { Injectable } from "@nestjs/common";
 import { isErrorResult, merge } from "openapi-merge";
 import OpenAPISchemaValidator from "openapi-schema-validator";
 import { OpenAPI } from "openapi-types";
-import { ServiceRecordDto } from "src/dtos";
 
 import { IServiceListItem } from "./service-record.service";
 
@@ -17,7 +16,9 @@ export class ApiDocService {
 
   readonly generateKey = (service: string): string => `${this.key}:${service}`;
 
-  readonly fetch = async (dto: ServiceRecordDto): Promise<OpenAPI.Document> => {
+  readonly fetch = async (
+    dto: RegisterOptionsDto,
+  ): Promise<OpenAPI.Document> => {
     const { host, port, service } = dto;
     const url = `http://${host}:${port}/api-json`;
     const res = await fetch(url, {

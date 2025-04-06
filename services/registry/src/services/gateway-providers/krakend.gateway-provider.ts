@@ -13,13 +13,24 @@ export class KrakendGatewayProvider implements GatewayProvider {
     const endpoints: IKrakendEndpoint[] = docs
       .map(({ doc, hosts, service }) => {
         console.log(service, hosts);
+        console.dir(doc, { colors: true, depth: null });
         if (doc.paths === undefined) return;
         return Object.keys(doc.paths)
           .map(key => {
             return (
               doc.paths?.[key] !== undefined &&
               Object.keys(doc.paths[key]).map(method => ({
-                backend: [{ host: hosts, url_pattern: key }],
+                backend: [
+                  {
+                    extra_config: {
+                      "backend/http": {
+                        return_error_code: true,
+                      },
+                    },
+                    host: hosts,
+                    url_pattern: key,
+                  },
+                ],
                 endpoint: join("/", service, key),
                 method:
                   method &&
@@ -35,8 +46,14 @@ export class KrakendGatewayProvider implements GatewayProvider {
       .filter(i => !!i);
 
     const krakendConfig = {
+      $schema: "http://www.krakend.io/schema/krakend.json",
       endpoints,
-      version: "3",
+      extra_config: {
+        router: {
+          return_error_msg: true,
+        },
+      },
+      version: 3,
     };
 
     await writeFile(

@@ -5,6 +5,8 @@ import { BullModule, InjectQueue } from "@nestjs/bullmq";
 import { Module, OnModuleInit } from "@nestjs/common";
 import { Queue } from "bullmq";
 
+import { RegistryClientController } from "./registry-client.controller";
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { keyPrefix, ...bullmqRedisOpts } = configShared.data.redisOptions;
 
@@ -17,6 +19,7 @@ export class RegistryClientModule implements OnModuleInit {
 
   static register() {
     return {
+      controllers: [RegistryClientController],
       exports: [],
       imports: [
         BullModule.forRoot({

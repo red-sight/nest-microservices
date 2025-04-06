@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsPort, IsString } from "class-validator";
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsOptional,
+  IsPort,
+  IsString,
+} from "class-validator";
 
 export class RegisterOptionsDto {
   @IsNotEmpty()
@@ -12,4 +18,8 @@ export class RegisterOptionsDto {
   @IsNotEmpty()
   @IsPort()
   port: string;
+
+  @IsOptional()
+  @IsBoolean()
+  alive?: boolean;
 }

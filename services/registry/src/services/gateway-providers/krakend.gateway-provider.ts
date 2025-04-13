@@ -18,25 +18,43 @@ export class KrakendGatewayProvider implements GatewayProvider {
           .map(key => {
             return (
               doc.paths?.[key] !== undefined &&
-              Object.keys(doc.paths[key]).map(method => ({
-                backend: [
-                  {
-                    extra_config: {
-                      "backend/http": {
-                        return_error_code: true,
+              Object.keys(doc.paths[key]).map(method => {
+                let queryParams = [];
+
+                if (
+                  doc.paths?.[key]?.[method] &&
+                  typeof doc.paths[key][method] === "object" &&
+                  "parameters" in doc.paths[key][method]
+                ) {
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                  queryParams = doc.paths[key][method]?.parameters.filter(
+                    p => p.in && p.in === "query",
+                  );
+                }
+
+                return {
+                  backend: [
+                    {
+                      extra_config: {
+                        "backend/http": {
+                          return_error_code: true,
+                        },
                       },
+                      host: hosts,
+                      url_pattern: key,
                     },
-                    host: hosts,
-                    url_pattern: key,
-                  },
-                ],
-                endpoint: join("/", service, key),
-                method:
-                  method &&
-                  Object.keys(EKrakendHttpMethod).includes(method.toUpperCase())
-                    ? (method.toUpperCase() as EKrakendHttpMethod)
-                    : EKrakendHttpMethod.GET,
-              }))
+                  ],
+                  endpoint: join("/", service, key),
+                  input_query_strings: queryParams,
+                  method:
+                    method &&
+                    Object.keys(EKrakendHttpMethod).includes(
+                      method.toUpperCase(),
+                    )
+                      ? (method.toUpperCase() as EKrakendHttpMethod)
+                      : EKrakendHttpMethod.GET,
+                };
+              })
             );
           })
           .flat();

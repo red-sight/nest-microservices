@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 
 import { AppService } from "./app.service";
-import { MethodADto } from "./dtos/MethodA.dto";
+import { MethodADto, QueryParamsDto } from "./dtos";
 
 @Controller()
 export class AppController {
@@ -20,8 +20,16 @@ export class AppController {
     return { response: "AAAAAAA" };
   }
 
-  @Get("new_one2")
-  newApi() {
+  @Get("with_params/:param1")
+  newApi(@Param("param1") param1: string) {
+    console.log("in newApi", param1);
+    return { new: "bar" };
+  }
+
+  @Get("with_query")
+  newApiWithQuery(@Query() query: QueryParamsDto) {
+    console.log("in newApiWithQuery", query);
+
     return { new: "bar" };
   }
 }

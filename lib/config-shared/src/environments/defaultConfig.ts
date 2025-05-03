@@ -1,21 +1,25 @@
 import { getEnvVar, getEnvVarOrThrow } from "@lib/config";
-import { IConfig } from "../config.interface";
-import { RmqOptions, Transport } from "@nestjs/microservices";
 import { VersioningType } from "@nestjs/common";
+import { RmqOptions, Transport } from "@nestjs/microservices";
+
+import { IConfig } from "../config.interface";
 
 const appCode = getEnvVar("APP_CODE") ?? "app-code";
 const packageName = getEnvVarOrThrow("npm_package_name");
+const appTitle = getEnvVar("APP_TITLE") ?? "Nest microservices application";
+const appDescription = getEnvVar("APP_DESCRIPTION") ?? "App description";
+const appVersion = getEnvVar("APP_VERSION") ?? "1";
 
 const microserviceOptions: RmqOptions = {
-  transport: Transport.RMQ,
   options: {
-    urls: ["amqp://localhost:5672"],
     queue: packageName,
     queueOptions: {
       durable: true,
       // autoDelete: true,
     },
+    urls: ["amqp://localhost:5672"],
   },
+  transport: Transport.RMQ,
 };
 // const microserviceOptions: NatsOptions = {
 //   transport: Transport.NATS,
@@ -31,9 +35,9 @@ const microserviceOptions: RmqOptions = {
 // };
 
 export const defaultConfig: IConfig<RmqOptions> = {
-  redisOptions: {
-    keyPrefix: appCode,
-  },
+  appDescription,
+  appTitle,
+  appVersion,
 
   microserviceOptions,
 
@@ -47,12 +51,18 @@ export const defaultConfig: IConfig<RmqOptions> = {
     },
   },
 
-  // microserviceRegistryClientOptions: microserviceOptions,
-
-  versioning: {
-    type: VersioningType.URI,
-    defaultVersion: "1",
+  redisOptions: {
+    host: "localhost",
+    keyPrefix: appCode,
+    port: 6378,
   },
 
+  // microserviceRegistryClientOptions: microserviceOptions,
+
   validationPipeOptions: {},
+
+  versioning: {
+    defaultVersion: appVersion,
+    type: VersioningType.URI,
+  },
 };

@@ -5,19 +5,19 @@ import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, OpenAPIObject, SwaggerModule } from "@nestjs/swagger";
 
 export interface IBootstrapOpts {
-  enableVersioning?: boolean;
-  enableValidationPipe?: boolean;
-  enableMicroservice?: boolean;
   enableHttpService?: boolean;
+  enableMicroservice?: boolean;
+  enableValidationPipe?: boolean;
+  enableVersioning?: boolean;
 }
 
 export async function bootstrap(
   AppModule: Type<unknown>,
   {
-    enableVersioning = true,
-    enableValidationPipe = true,
-    enableMicroservice = true,
     enableHttpService = true,
+    enableMicroservice = true,
+    enableValidationPipe = true,
+    enableVersioning = true,
   }: IBootstrapOpts = {},
 ): Promise<{ app: INestApplication }> {
   const serviceName = getEnvVarOrThrow("npm_package_name");
@@ -37,7 +37,7 @@ export async function bootstrap(
       inheritAppConfig: true,
     });
     await app.startAllMicroservices();
-    // await app.init();
+    if (!enableHttpService) await app.init();
     console.log(`✨ Microservice ${serviceName} has started`);
   }
 
@@ -45,7 +45,7 @@ export async function bootstrap(
     const httpPort = getEnvVarOrThrow("HTTP_PORT");
     if (enableVersioning) app.enableVersioning(configShared.data.versioning);
     configureSwagger(app, serviceName);
-    await app.listen(httpPort, () => {
+    await app.listen(httpPort, "0.0.0.0", () => {
       console.log(
         `🌍 HTTP application ${serviceName} is accepting connections on port ${httpPort}`,
       );
@@ -61,10 +61,8 @@ function configureSwagger(
 ): OpenAPIObject {
   const config = new DocumentBuilder()
     .setTitle(serviceName)
-    .setDescription("API description")
-    .setVersion("1.0")
+    .setVersion(configShared.data.appVersion)
     .build();
-
   const documentFactory = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, documentFactory);
   return documentFactory;

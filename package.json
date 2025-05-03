@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
-    "lint": "turbo lint",
+    "lint": "FORCE_COLOR=1 && yarn workspaces foreach -iA -j unlimited --exclude maple run lint",
+    "lint:fix": "FORCE_COLOR=1 && yarn workspaces foreach -iA -j unlimited --exclude maple run lint:fix",
     "start:dev": "turbo watch start:dev build",
     "watch": "turbo watch start:prod build"
   },

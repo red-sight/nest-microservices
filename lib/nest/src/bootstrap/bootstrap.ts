@@ -25,6 +25,7 @@ export async function bootstrap(
   const app = await NestFactory.create(AppModule, {
     abortOnError: false,
     bufferLogs: true,
+    logger: ["error", "warn", "log"],
   });
 
   if (enableValidationPipe)

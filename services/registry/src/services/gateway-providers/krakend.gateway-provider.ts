@@ -26,10 +26,14 @@ export class KrakendGatewayProvider implements GatewayProvider {
                   typeof doc.paths[key][method] === "object" &&
                   "parameters" in doc.paths[key][method]
                 ) {
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                  queryParams = doc.paths[key][method]?.parameters.filter(
-                    p => p.in && p.in === "query",
-                  );
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                  queryParams = doc.paths[key][method]?.parameters
+                    .filter(
+                      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+                      p => p.in && p.in === "query",
+                    )
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+                    .map(p => p.name);
                 }
 
                 return {

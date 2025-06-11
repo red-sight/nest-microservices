@@ -51,13 +51,13 @@ export const defaultConfig: IConfig<RmqOptions> = {
     },
   },
 
+  // microserviceRegistryClientOptions: microserviceOptions,
+
   redisOptions: {
     host: "localhost",
     keyPrefix: appCode,
     port: 6378,
   },
-
-  // microserviceRegistryClientOptions: microserviceOptions,
 
   validationPipeOptions: {},
 

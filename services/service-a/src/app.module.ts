@@ -5,11 +5,11 @@ import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 
-const options = configShared.data.redisOptions;
+const redisOpts = configShared.data.redisOptions;
 
 @Module({
   controllers: [AppController],
-  imports: [RedisModule.register(options), RegistryClientModule.register()],
+  imports: [RedisModule.register(redisOpts), RegistryClientModule.register()],
   providers: [AppService],
 })
 export class AppModule {}

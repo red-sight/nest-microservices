@@ -10,7 +10,6 @@ export class AppController {
   @Get("/hello")
   getHello(): unknown {
     console.log("in hello 2");
-
     return this.appService.getHello();
   }
 

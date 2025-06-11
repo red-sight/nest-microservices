@@ -86,7 +86,7 @@ export class ApiDocService {
     );
 
     if (isErrorResult(mergeResult)) {
-      console.error("Failed to merge OpenAPI doc");
+      console.error("Failed to merge OpenAPI doc", mergeResult);
       return;
     }
 

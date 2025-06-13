@@ -1,3 +1,5 @@
+import { ConnectionConfig } from "@keycloak/keycloak-admin-client/lib/client";
+import { Credentials } from "@keycloak/keycloak-admin-client/lib/utils/auth";
 import { ValidationPipeOptions, VersioningOptions } from "@nestjs/common";
 import {
   CustomStrategy,
@@ -26,6 +28,11 @@ export interface IConfig<
   appTitle: string;
 
   appVersion: string;
+
+  keycloakAdminClient: {
+    config: ConnectionConfig;
+    credentials: Credentials;
+  };
 
   microserviceOptions: T;
 

@@ -9,6 +9,7 @@ import { Queue } from "bullmq";
 import { HealthCheckConsumer, RegistryRequestsConsumer } from "./consumers";
 import {
   ApiDocService,
+  KeycloakAuthProvider,
   KrakendGatewayProvider,
   ServiceRecordService,
 } from "./services";
@@ -37,6 +38,7 @@ const { keyPrefix, ...bullmqRedisOpts } = configShared.data.redisOptions;
     ServiceRecordService,
     KrakendGatewayProvider,
     HealthCheckConsumer,
+    KeycloakAuthProvider,
   ],
 })
 export class AppModule implements OnApplicationBootstrap {

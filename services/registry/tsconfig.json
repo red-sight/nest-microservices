@@ -2,6 +2,6 @@
   "extends": "@lib/typescript-config/tsconfig.nest.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "baseUrl": "./",
+    "baseUrl": "./"
   }
 }

@@ -5,11 +5,16 @@ import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import { IApiDocMergeItem } from "../api-doc.service";
+import { KeycloakAuthProvider } from "../auth-providers";
 import { GatewayProvider } from "./gateway-provider.service";
 
 @Injectable()
 export class KrakendGatewayProvider implements GatewayProvider {
+  constructor(private readonly keycloakAuthProvider: KeycloakAuthProvider) {}
+
   readonly configure = async (docs: IApiDocMergeItem[]) => {
+    const roles = await this.keycloakAuthProvider.mapRolesPermissions();
+
     const endpoints: IKrakendEndpoint[] = docs
       .map(({ doc, hosts, service }) => {
         console.log(service, hosts);
@@ -20,20 +25,46 @@ export class KrakendGatewayProvider implements GatewayProvider {
               doc.paths?.[key] !== undefined &&
               Object.keys(doc.paths[key]).map(method => {
                 let queryParams = [];
+                let requiresAuthentication = true;
+                const rolesSet = new Set();
 
                 if (
                   doc.paths?.[key]?.[method] &&
-                  typeof doc.paths[key][method] === "object" &&
-                  "parameters" in doc.paths[key][method]
+                  typeof doc.paths[key][method] === "object"
                 ) {
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                  queryParams = doc.paths[key][method]?.parameters
-                    .filter(
+                  if ("parameters" in doc.paths[key][method])
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                    queryParams = doc.paths[key][method]?.parameters
+                      .filter(
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+                        p => p.in && p.in === "query",
+                      )
                       // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-                      p => p.in && p.in === "query",
-                    )
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-                    .map(p => p.name);
+                      .map(p => p.name);
+                  if ("x-requires-authentication" in doc.paths[key][method]) {
+                    requiresAuthentication =
+                      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                      doc.paths[key][method]["x-requires-authentication"] ===
+                      true;
+                  }
+                  if ("x-authorized-permissions" in doc.paths[key][method]) {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                    const authorizedPermissions =
+                      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                      doc.paths[key][method]["x-authorized-permissions"];
+                    if (Array.isArray(authorizedPermissions)) {
+                      authorizedPermissions.forEach(p => {
+                        if (typeof p !== "string") return;
+                        if (!Object.keys(roles).includes(p)) {
+                          rolesSet.add(p);
+                          return;
+                        }
+                        roles[p].forEach(r => {
+                          rolesSet.add(r);
+                        });
+                      });
+                    }
+                  }
                 }
 
                 return {
@@ -49,6 +80,22 @@ export class KrakendGatewayProvider implements GatewayProvider {
                     },
                   ],
                   endpoint: join("/", service, key),
+                  extra_config: {
+                    ...(requiresAuthentication && {
+                      "auth/validator": {
+                        alg: "RS256",
+                        disable_jwk_security: true,
+                        issuer: "http://localhost:7080/realms/app",
+                        jwk_url:
+                          "http://host.docker.internal:7080/realms/app/protocol/openid-connect/certs",
+                        ...(!!rolesSet.size && {
+                          roles: [...rolesSet],
+                          roles_key: "realm_access.roles",
+                          roles_key_is_nested: true,
+                        }),
+                      },
+                    }),
+                  },
                   input_query_strings: queryParams,
                   method:
                     method &&

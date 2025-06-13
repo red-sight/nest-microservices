@@ -1202,11 +1202,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@keycloak/keycloak-admin-client@npm:26.2.5, @keycloak/keycloak-admin-client@npm:^26.2.5":
+  version: 26.2.5
+  resolution: "@keycloak/keycloak-admin-client@npm:26.2.5"
+  dependencies:
+    camelize-ts: "npm:^3.0.0"
+    url-join: "npm:^5.0.0"
+    url-template: "npm:^3.1.1"
+  checksum: 10c0/50d169a3c1fa9283ae09abe2d8cda04f0998d7c8e4ad8789e649717344df17f68e6d80a4dc18a495874c457567a3466f8b5a8876cc9a6ee32af724253039e4f2
+  languageName: node
+  linkType: hard
+
 "@lib/config-shared@workspace:^, @lib/config-shared@workspace:lib/config-shared":
   version: 0.0.0-use.local
   resolution: "@lib/config-shared@workspace:lib/config-shared"
   dependencies:
     "@eslint/js": "npm:^9.16.0"
+    "@keycloak/keycloak-admin-client": "npm:^26.2.5"
     "@lib/config": "workspace:^"
     "@lib/lint": "workspace:^"
     "@lib/typescript-config": "workspace:^"
@@ -1890,6 +1902,15 @@ __metadata:
   version: 0.1.1
   resolution: "@pkgr/core@npm:0.1.1"
   checksum: 10c0/3f7536bc7f57320ab2cf96f8973664bef624710c403357429fbf680a5c3b4843c1dbd389bb43daa6b1f6f1f007bb082f5abcb76bb2b5dc9f421647743b71d3d8
+  languageName: node
+  linkType: hard
+
+"@s3pweb/keycloak-admin-client-cjs@npm:^26.2.5":
+  version: 26.2.5
+  resolution: "@s3pweb/keycloak-admin-client-cjs@npm:26.2.5"
+  dependencies:
+    "@keycloak/keycloak-admin-client": "npm:26.2.5"
+  checksum: 10c0/cc342eac04e3877c528e1485206bb492e94e7fdfb61c4e8569da2a782dc1f9de75be84020999b67519f51d8a9e3d8d1a4bbce3324ca4dbbe2352efb8c6c1755c
   languageName: node
   linkType: hard
 
@@ -3746,6 +3767,13 @@ __metadata:
   version: 6.3.0
   resolution: "camelcase@npm:6.3.0"
   checksum: 10c0/0d701658219bd3116d12da3eab31acddb3f9440790c0792e0d398f0a520a6a4058018e546862b6fba89d7ae990efaeb97da71e1913e9ebf5a8b5621a3d55c710
+  languageName: node
+  linkType: hard
+
+"camelize-ts@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "camelize-ts@npm:3.0.0"
+  checksum: 10c0/879a7a84a1c889eb71b46ad5933107324eeeda0b713367aebe22356e25039636b5ce2f460ff4f302621e3d3ed8b6b0f2bcd8baee5218a8a38ff2b71d2c2a0522
   languageName: node
   linkType: hard
 
@@ -8623,6 +8651,7 @@ __metadata:
     "@nestjs/schedule": "npm:^5.0.1"
     "@nestjs/schematics": "npm:^11.0.0"
     "@nestjs/testing": "npm:^11.0.1"
+    "@s3pweb/keycloak-admin-client-cjs": "npm:^26.2.5"
     "@swc/cli": "npm:^0.6.0"
     "@swc/core": "npm:^1.10.7"
     "@types/express": "npm:^5.0.0"
@@ -10412,6 +10441,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"url-join@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "url-join@npm:5.0.0"
+  checksum: 10c0/ed2b166b4b5a98adcf6828a48b6bd6df1dac4c8a464a73cf4d8e2457ed410dd8da6be0d24855b86026cd7f5c5a3657c1b7b2c7a7c5b8870af17635a41387b04c
+  languageName: node
+  linkType: hard
+
 "url-parse@npm:~1.5.10":
   version: 1.5.10
   resolution: "url-parse@npm:1.5.10"
@@ -10419,6 +10455,13 @@ __metadata:
     querystringify: "npm:^2.1.1"
     requires-port: "npm:^1.0.0"
   checksum: 10c0/bd5aa9389f896974beb851c112f63b466505a04b4807cea2e5a3b7092f6fbb75316f0491ea84e44f66fed55f1b440df5195d7e3a8203f64fcefa19d182f5be87
+  languageName: node
+  linkType: hard
+
+"url-template@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "url-template@npm:3.1.1"
+  checksum: 10c0/0947f4978665ced04bb0fe456f8a60ca4e1db283ce36da15193ee52c4a5461633dc9b5116ef8cf34bae4a31285ac6e7079f309badf211fe8bd1428d6ac56d28a
   languageName: node
   linkType: hard
 

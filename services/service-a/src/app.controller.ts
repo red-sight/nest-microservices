@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
+import { ApiExtension } from "@nestjs/swagger";
 
 import { AppService } from "./app.service";
 import { MethodADto, QueryParamsDto } from "./dtos";
@@ -8,6 +9,8 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get("/hello")
+  @ApiExtension("x-requires-authentication", true)
+  @ApiExtension("x-authorized-permissions", ["users:read"])
   getHello(): unknown {
     console.log("in hello 2");
     return this.appService.getHello();

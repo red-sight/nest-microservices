@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.16.0",
+    "@keycloak/keycloak-admin-client": "^26.2.5",
     "@lib/lint": "workspace:^",
     "@lib/typescript-config": "workspace:^",
     "@nestjs-plugins/nestjs-nats-jetstream-transport": "^2.2.6",

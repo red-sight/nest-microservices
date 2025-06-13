@@ -39,7 +39,23 @@ export const defaultConfig: IConfig<RmqOptions> = {
   appTitle,
   appVersion,
 
+  keycloakAdminClient: {
+    config: {
+      baseUrl: "http://localhost:7080",
+      realmName: "master",
+    },
+    credentials: {
+      clientId: "admin-cli",
+      // clientSecret: getEnvVarOrThrow("KEYCLOAK_ADMIN_CLIENT_SECRET"),
+      grantType: "password",
+      password: getEnvVarOrThrow("KEYCLOAK_ADMIN_PASSWORD"),
+      username: getEnvVarOrThrow("KEYCLOAK_ADMIN_USERNAME"),
+    },
+  },
+
   microserviceOptions,
+
+  // microserviceRegistryClientOptions: microserviceOptions,
 
   microserviceRegistryClientOptions: {
     ...(microserviceOptions.transport && {
@@ -50,8 +66,6 @@ export const defaultConfig: IConfig<RmqOptions> = {
       queue: "registry",
     },
   },
-
-  // microserviceRegistryClientOptions: microserviceOptions,
 
   redisOptions: {
     host: "localhost",
